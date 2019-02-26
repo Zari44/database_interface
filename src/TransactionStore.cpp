@@ -53,18 +53,18 @@ std::vector<Transaction> TransactionStore::findTransactions(const std::string &a
 
 double TransactionStore::calculateAverageAmount(const std::string &accNo) {
 
-    int no_transactions = transactions_hashed.count(accNo);
+    int no_transactions = transactions_hashed[accNo].size();
 
     if (!no_transactions)
         return 0.0;
 
-    double total_amount = 0.0;
+    int total_amount = 0.0;
 
     for (const auto& trans : transactions_hashed[accNo]) {
         total_amount += trans.second.amount;
     }
 
-    return static_cast<double>(total_amount / no_transactions);
+    return total_amount / static_cast<double>(no_transactions);
 }
 
 void TransactionStore::setTransactions(const std::vector<Transaction> &transactions) {
