@@ -5,14 +5,6 @@
 
 
 
-//virtual std::vector<Transaction> findTransactions(const std::string &accNo) = 0;
-
-
-//virtual double calculateAverageAmount(const std::string &accNo) = 0;
-
-/**
- * Sets list of all transactions (data source) to be used by other methods.
- */
 //virtual void setTransactions(const std::vector<Transaction> &transactions) = 0;
 
 /**
@@ -35,12 +27,16 @@ Transaction TransactionStore::findTransaction(const std::string &accNo, int txNo
 /**
  * Finds all transactions with given account number.
  * Transactions are sorted by txNo without duplicates (same accNo, txNo).
+ *
+ * NOTE:
+ * If no transactions found just empty vector is returned (no exception throwing is neccessary).
+ *
  */
 std::vector<Transaction> TransactionStore::findTransactions(const std::string &accNo) {
 
     std::vector<Transaction> transactions;
 
-    for (const auto& trans_map : transactions_hashed[accNo]){
+    for (const auto& trans_map : transactions_hashed[accNo]) {
         transactions.push_back(trans_map.second);
     }
 
@@ -67,12 +63,20 @@ double TransactionStore::calculateAverageAmount(const std::string &accNo) {
     return total_amount / static_cast<double>(no_transactions);
 }
 
+
+/**
+ * Sets list of all transactions (data source) to be used by other methods.
+ *
+ * NOTE:
+ * if account number was mentioned to be 32-chars long alphanum string;
+ * either there is
+ */
+
 void TransactionStore::setTransactions(const std::vector<Transaction> &transactions) {
 
     for (const auto& trans : transactions) {
         transactions_hashed[trans.accNo][trans.txNo] = trans;
     }
-
 }
 
 

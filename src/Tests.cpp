@@ -46,16 +46,41 @@ TEST(txTests, findTransactions) {
     EXPECT_EQ(2, t2.size());
     EXPECT_EQ(5610, t2[0].txNo);
     EXPECT_EQ(5611, t2[1].txNo);
+
+    // when no account number in database
+    auto t3 = db->findTransactions("56102055610000310200008666");
+    EXPECT_EQ(0, t3.size());
+}
+
+// check for requirement of throwing exceptions
+TEST(txTests, isThrownException){
+    Database *db = new TransactionStore();
+    db->setTransactions(transactions);
+    EXPECT_THROW(
+        auto t1 = db->findTransaction("56102055610000310200008434", 5611),
+        std::exception
+    );
+
+    EXPECT_THROW(
+        auto t2 = db->findTransaction("56102055610000310200008433", 1537),
+        std::exception
+    );
 }
 
 TEST(txTests, calculateAverageAmount) {
     Database *db = new TransactionStore();
     db->setTransactions(transactions);
 
-    double avg = db->calculateAverageAmount("7230600000000200006669");
+    double avg1 = db->calculateAverageAmount("7230600000000200006669");
+    EXPECT_EQ(723650, (int)(avg1 * 100));
 
-    EXPECT_EQ(723650, (int)(avg * 100));
+    // no account number found
+    double avg2 = db->calculateAverageAmount("7230600000000200006670");
+    EXPECT_EQ(0, (int)(avg2 * 100));
 }
+
+
+
 
 
 
