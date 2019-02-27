@@ -6,6 +6,20 @@
 #include <unordered_map>
 #include <map>
 
+class NoAccountNumberException : public std::runtime_error {
+public:
+  NoAccountNumberException() :
+  std::runtime_error("Error! No account number found in database"){
+
+  }
+};
+
+class NoTransactionNumberException : public std::runtime_error {
+public:
+  NoTransactionNumberException() :
+  std::runtime_error("Error! No transaction number found in database"){
+  }
+};
 
 class TransactionStore : public Database {
 public:
@@ -14,7 +28,7 @@ public:
     double calculateAverageAmount(const std::string &accNo) override;
     void setTransactions(const std::vector<Transaction> &transactions) override;
 private:
-    std::unordered_map<std::string, std::map<unsigned int, Transaction> > transactions_hashed;
+    std::unordered_map<std::string, std::map<unsigned int, double> > hashed_transactions;
 };
 
 #endif //INTERVIEW_TRANSACTIONSTORE_H

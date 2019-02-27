@@ -2,42 +2,49 @@
 #include "Database.h"
 
 
-
-
-
-//virtual void setTransactions(const std::vector<Transaction> &transactions) = 0;
-
 /**
  * Finds one transaction by its account number and transaction id.
  * If there are duplicates (by accNo, txNo) returns first matching.
  *
  * Throws exception if not found.
+ *
+ * NOTE: txNo - suoldn't it be unsigned int?
+ * Exceptions: probably a new exception type that inherits from, for example, "runtime_error"
  */
 Transaction TransactionStore::findTransaction(const std::string &accNo, int txNo) {
 
-    if (transactions_hashed.count(accNo) == 0)
-        throw std::exception();
+    if (hashed_transactions.count(accNo) == 0)
+        throw NoAccountNumberException();
 
-    if (transactions_hashed[accNo].count(txNo) == 0)
-        throw std::exception();
+    if (hashed_transactions[accNo].count(txNo) == 0)
+        throw NoTransactionNumberException();
 
-    return transactions_hashed[accNo][txNo];
+    Transaction transaction;
+    transaction.accNo = accNo;
+    transaction.txNo = txNo;
+    transaction.amount = hashed_transactions[accNo][txNo];
+
+    return transaction;
 }
 
 /**
  * Finds all transactions with given account number.
  * Transactions are sorted by txNo without duplicates (same accNo, txNo).
- *
+ *unsigned
  * NOTE:
  * If no transactions found just empty vector is returned (no exception throwing is neccessary).
- *
+ * Maybe for cleanliness Transaction could have three-argument constructor defined.
  */
 std::vector<Transaction> TransactionStore::findTransactions(const std::string &accNo) {
 
     std::vector<Transaction> transactions;
 
-    for (const auto& trans_map : transactions_hashed[accNo]) {
-        transactions.push_back(trans_map.second);
+    for (const auto& trans_map : hashed_transactions[accNo]) {
+        Transaction transaction;
+        transaction.accNo = accNo;
+        transaction.txNo = trans_map.first;
+        transaction.amount = trans_map.second;
+        transactions.push_back(transaction);
     }
 
     return transactions;
@@ -49,15 +56,15 @@ std::vector<Transaction> TransactionStore::findTransactions(const std::string &a
 
 double TransactionStore::calculateAverageAmount(const std::string &accNo) {
 
-    int no_transactions = transactions_hashed[accNo].size();
+    unsigned int no_transactions = hashed_transactions[accNo].size();
 
     if (!no_transactions)
         return 0.0;
 
-    int total_amount = 0.0;
+    double total_amount = 0.0;
 
-    for (const auto& trans : transactions_hashed[accNo]) {
-        total_amount += trans.second.amount;
+    for (const auto& transaction_map : hashed_transactions[accNo]) {
+        total_amount += transaction_map.second;
     }
 
     return total_amount / static_cast<double>(no_transactions);
@@ -69,13 +76,14 @@ double TransactionStore::calculateAverageAmount(const std::string &accNo) {
  *
  * NOTE:
  * if account number was mentioned to be 32-chars long alphanum string;
- * either there is
+ * in my opinion, to avoid errors, all numbers that are shorter than 32
+ * should have leadning zeros added
  */
 
 void TransactionStore::setTransactions(const std::vector<Transaction> &transactions) {
 
     for (const auto& trans : transactions) {
-        transactions_hashed[trans.accNo][trans.txNo] = trans;
+        hashed_transactions[trans.accNo][trans.txNo] = trans.amount;
     }
 }
 

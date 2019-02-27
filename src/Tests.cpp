@@ -20,6 +20,8 @@ static std::vector<Transaction> transactions =
                 {"50102055581111101998100048", 501,  501.00},
                 {"50102055581111101998100048", 503,  503.00},
                 {"50102055581111101998100048", 501,  501.00},
+                {"50102055581111101998100050", 1,   -100.00},
+                {"50102055581111101998100050", 2,    200.00},
         };
 
 
@@ -47,23 +49,23 @@ TEST(txTests, findTransactions) {
     EXPECT_EQ(5610, t2[0].txNo);
     EXPECT_EQ(5611, t2[1].txNo);
 
-    // when no account number in database
-    auto t3 = db->findTransactions("56102055610000310200008666");
+    // when no account number in database return empty vector
+    auto t3 = db->findTransactions("invalid");
     EXPECT_EQ(0, t3.size());
 }
 
 // check for requirement of throwing exceptions
-TEST(txTests, isThrownException){
+TEST(txTests, findTransactionIsThrownException){
     Database *db = new TransactionStore();
     db->setTransactions(transactions);
     EXPECT_THROW(
-        auto t1 = db->findTransaction("56102055610000310200008434", 5611),
-        std::exception
+        auto t1 = db->findTransaction("invalid", 5611),
+        NoAccountNumberException
     );
 
     EXPECT_THROW(
-        auto t2 = db->findTransaction("56102055610000310200008433", 1537),
-        std::exception
+        auto t2 = db->findTransaction("35102049000000990200522828", 0),
+        NoTransactionNumberException
     );
 }
 
@@ -75,8 +77,12 @@ TEST(txTests, calculateAverageAmount) {
     EXPECT_EQ(723650, (int)(avg1 * 100));
 
     // no account number found
-    double avg2 = db->calculateAverageAmount("7230600000000200006670");
+    double avg2 = db->calculateAverageAmount("invalid");
     EXPECT_EQ(0, (int)(avg2 * 100));
+
+    // negative number
+    double avg3 = db->calculateAverageAmount("50102055581111101998100050");
+    EXPECT_EQ(5000, (int)(avg3 * 100));
 }
 
 

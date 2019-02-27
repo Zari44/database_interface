@@ -1,0 +1,12 @@
+googletest/googlemock/include/gmock
+googletest/googlemock/include/gmock/internal
+googletest/googlemock/include/gmock/internal/custom
+googletest/googlemock/test
+googletest/googletest/include/gtest
+googletest/googletest/include/gtest/internal
+googletest/googletest/include/gtest/internal/custom
+googletest/googletest/samples
+googletest/googletest/src
+googletest/googletest/test
+googletest/googletest/xcode/Samples/FrameworkSample
+src

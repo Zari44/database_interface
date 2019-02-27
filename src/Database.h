@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+
+//NOTE: I would use fixed point precision for amount because it double precision
+//      might cause problems because its representation.
 struct Transaction {
     std::string accNo; // account number, not empty, 32 alphanum
     unsigned int txNo; // transaction number >= 0
